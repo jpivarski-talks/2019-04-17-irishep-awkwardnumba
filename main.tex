@@ -366,8 +366,8 @@ def run_plain(num_muons, pt_muons, eta_muons, phi_muons,
     for i in range(len(num_muons)):
         offsets[i + 1] = offsets[i]
         for muoni in range(num_muons[i]):
-            pt1  = pt_muons[i][muoni]
-            eta1 = eta_muons[i][muoni]
+            pt1  = pt_muons[i][muoni]                        # more verbose than it
+            eta1 = eta_muons[i][muoni]                       # would be with Table
             phi1 = phi_muons[i][muoni]
             for jeti in range(num_jets[i]):
                 pt2  = pt_jets[i][jeti]
@@ -390,8 +390,8 @@ def run_numba(num_muons, pt_muons, eta_muons, phi_muons,     # can pass JaggedAr
     for i in range(len(num_muons)):
         offsets[i + 1] = offsets[i]
         for muoni in range(num_muons[i]):
-            pt1  = pt_muons[i][muoni]
-            eta1 = eta_muons[i][muoni]
+            pt1  = pt_muons[i][muoni]                        # more verbose than it
+            eta1 = eta_muons[i][muoni]                       # would be with Table
             phi1 = phi_muons[i][muoni]
             for jeti in range(num_jets[i]):
                 pt2  = pt_jets[i][jeti]
@@ -411,7 +411,7 @@ def run_numba(num_muons, pt_muons, eta_muons, phi_muons,     # can pass JaggedAr
 \begin{center}
 \begin{tabular}{l l l l}
 {\bf Method} & {\bf Pro}  & {\bf Con}  & {\bf Runtime} \\\hline
-{\tt JaggedArray.cross} & concise  & inflexible & \textcolor{white}{12}1.1\textcolor{white}{2} seconds \\
+{\tt\normalsize JaggedArray.cross} & concise  & inflexible & \textcolor{white}{12}1.1\textcolor{white}{2} seconds \\
 Plain Python loop       & explicit & verbose    & 120\textcolor{white}{.62} seconds \\
 Numba-compiled          & explicit & verbose    & \textcolor{white}{12}0.62 seconds (to compile) \\
                         &          &            & \textcolor{white}{12}0.22 seconds (to run)
@@ -420,7 +420,22 @@ Numba-compiled          & explicit & verbose    & \textcolor{white}{12}0.62 seco
 
 \vspace{0.25 cm}
 Apart from a factor of 5 between {\tt\normalsize JaggedArray.cross} and Numba-compiled (which may leap-frog as implementations improve), we can now write arbitrary for-loop algorithms on {\tt\normalsize JaggedArray} without an enormous cost.
+
+\vspace{0.25 cm}
+\uncover<2->{\textcolor{darkblue}{The choice can be made based on the type of problem, not performance.}}
 \end{frame}
 
+\begin{frame}{Conclusions}
+\large
+\vspace{0.5 cm}
+\begin{itemize}\setlength{\itemsep}{0.25 cm}
+\item I highly recommend Numba for physics analysis.
+\item Code blocks are only accelerated by Numba if they consist of recognized functions and data structures, and if all types can be statically known.
+\item Awkward array types are statically known; I can extend Numba to recognize them and their operations.
+\item Done with {\tt\normalsize JaggedArrays} (the hardest); usable in a limited way.
+\item When {\tt\normalsize Tables}, {\tt\normalsize ObjectArrays}, and maybe {\tt\normalsize MaskedArrays} are done, most physics code will work.
+\item There are 9 other awkward array types\ldots
+\end{itemize}
+\end{frame}
 
 \end{document}
