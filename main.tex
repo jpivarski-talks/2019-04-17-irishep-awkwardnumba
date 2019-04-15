@@ -32,10 +32,10 @@
 \definecolor{darkgreen}{rgb}{0,0.6,0}
 \definecolor{mauve}{rgb}{0.58,0,0.82}
 
-\title[yyyy-mm-dd-DESCRIPTION]{TITLE}
+\title[2019-04-17-irishep-awkwardnumba]{Awkward Array: Numba}
 \author{Jim Pivarski}
 \institute{Princeton University -- IRIS-HEP}
-\date{MONTH DAY, YEAR}
+\date{April 17, 2019}
 
 \usetikzlibrary{shapes.callouts}
 
@@ -56,9 +56,25 @@
 
 % START START START START START START START START START START START START START
 
-\begin{frame}{First slide}
+\begin{frame}{Knowing your audience}
+\vspace{1 cm}
+{\large I presented a ``Accelerating Python'' tutorial to non-particle physics scientists:}
+
+\small
+\begin{itemize}\setlength{\itemsep}{-0.1 cm}
+\item 8 Computer Science/Software Engineering/Electrical Engineering
+\item 7 Physics/Astronomy/Energy Science/Atmospheric \& Ocean Science
+\item 5 Finance/Business/Political Science
+\item 2 Neuroscience
+\item 2 Civil Engineering
+\end{itemize}
+
+\large
 \vspace{0.5 cm}
-HERE
+\uncover<2->{I started by showing how for-loopy code must be fundamentally rewritten to take advantage of Numpy and why it might be worth the effort.}
+
+\vspace{0.5 cm}
+\uncover<3->{\textcolor{darkblue}{Surprise!} They were more comfortable with the \mbox{vectorized form (Numpy/Pandas)---\hspace{-0.5 cm}} for loops were {\it less familiar}.}
 \end{frame}
 
 \end{document}
