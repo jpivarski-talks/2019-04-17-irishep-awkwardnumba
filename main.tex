@@ -74,7 +74,7 @@
 \uncover<2->{I started by showing how for-loopy code must be fundamentally rewritten to take advantage of Numpy and why it might be worth the effort.}
 
 \vspace{0.5 cm}
-\uncover<3->{\textcolor{darkblue}{Surprise!} They were {\it more comfortable} with the \mbox{vectorized form (Numpy/Pandas).\hspace{-0.5 cm}} Going the other way---from Numpy to for loops---was more of an issue.}
+\uncover<3->{\textcolor{darkblue}{Surprise!} They were {\it more comfortable} with the \mbox{vectorized form (Numpy/Pandas).\hspace{-0.5 cm}} Going the other way---from Numpy to for loops---was the novelty for them.}
 \end{frame}
 
 \begin{frame}[fragile]{Knowing your audience}
@@ -170,10 +170,10 @@ Cython                     & dual language       &   $3.7\times$ & 1 \\
 \end{tabular}
 \end{center}
 
-\textcolor{gray}{(Sorted by my ease-of-use judgement. Iterative fractal example in my tutorials.)}
+\textcolor{gray}{(Sorted by my ease-of-use judgement.)}
 \end{frame}
 
-\begin{frame}[fragile]{Using Numba}
+\begin{frame}[fragile]{\only<1>{For-loopy plain Python code}\only<2>{For-loopy Numba-accelerated code}}
 \begin{columns}
 \column{1.08\linewidth}
 \small
@@ -224,7 +224,7 @@ fractal = run_numba(6400, 9600)            # runs 50× faster than plain
 \end{columns}
 \end{frame}
 
-\begin{frame}[fragile]{Using Numpy}
+\begin{frame}[fragile]{Columnar Numpy code}
 \begin{columns}
 \column{1.08\linewidth}
 \small
@@ -263,7 +263,7 @@ Numba can only accelerate \textcolor{darkblue}{functions} and \textcolor{darkblu
 \uncover<3->{\mintinline{python}{@numba.jit(nopython=True)} only allows accelerated code; \mintinline{python}{@numba.jit()} only accelerates what it can.}
 \end{frame}
 
-\begin{frame}{We can add functions and data structures}
+\begin{frame}{We can teach Numba to recognize more functions and types}
 \vspace{0.5 cm}
 \begin{columns}
 \column{1.13\linewidth}
@@ -425,7 +425,7 @@ Apart from a factor of 5 between {\tt\normalsize JaggedArray.cross} and Numba-co
 \uncover<2->{\textcolor{darkblue}{The choice can be made based on the type of problem, not performance.}}
 \end{frame}
 
-\begin{frame}{Conclusions}
+\begin{frame}{Summary}
 \large
 \vspace{0.5 cm}
 \begin{itemize}\setlength{\itemsep}{0.25 cm}
