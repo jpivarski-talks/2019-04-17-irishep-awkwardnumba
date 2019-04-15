@@ -165,8 +165,83 @@ Cython                     & dual language       &   $3.7\times$ & 1 \\
 \textcolor{gray}{(Sorted by my ease-of-use judgement. Iterative fractal example in my tutorials.)}
 \end{frame}
 
-\begin{frame}{}
+\begin{frame}[fragile]{Using Numba}
+\begin{columns}
+\column{1.08\linewidth}
+\small
+\begin{onlyenv}<1>
+\begin{minted}{python}
+import numpy
 
+
+def run_python(height, width, maxiterations=20):
+    y, x = numpy.ogrid[-1:0:height*1j, -1.5:0:width*1j]
+    c = x + y*1j
+    fractal = numpy.full(c.shape, maxiterations, dtype=numpy.int32)
+    for h in range(height):
+        for w in range(width):             # for each pixel (h, w)...
+            z = c[h, w]
+            for i in range(maxiterations): # iterate at most 20 times
+                z = z**2 + c[h, w]         # applying z → z² + c
+                if abs(z) > 2:             # if it diverges (|z| > 2)
+                    fractal[h, w] = i      # color with iteration number
+                    break                  # we're done; go away
+    return fractal
+
+fractal = run_python(6400, 9600)
+\end{minted}
+\end{onlyenv}
+\begin{onlyenv}<2>
+\begin{minted}{python}
+import numpy, numba
+
+@numba.jit
+def run_numba(height, width, maxiterations=20):
+    y, x = numpy.ogrid[-1:0:height*1j, -1.5:0:width*1j]
+    c = x + y*1j
+    fractal = numpy.full(c.shape, maxiterations, dtype=numpy.int32)
+    for h in range(height):
+        for w in range(width):             # for each pixel (h, w)...
+            z = c[h, w]
+            for i in range(maxiterations): # iterate at most 20 times
+                z = z**2 + c[h, w]         # applying z → z² + c
+                if abs(z) > 2:             # if it diverges (|z| > 2)
+                    fractal[h, w] = i      # color with iteration number
+                    break                  # we're done; go away
+    return fractal
+
+fractal = run_numba(6400, 9600)            # runs 50× faster
+\end{minted}
+\end{onlyenv}
+\end{columns}
 \end{frame}
+
+\begin{frame}[fragile]{Using Numpy}
+\begin{columns}
+\column{1.08\linewidth}
+\small
+\begin{minted}{python}
+import numpy
+
+
+def run_numpy(height, width, maxiterations=20):
+    y, x = numpy.ogrid[-1:0:height*1j, -1.5:0:width*1j]
+    c = x + y*1j
+    fractal = numpy.full(c.shape, maxiterations, dtype=numpy.int32)
+    z = c
+    for i in range(maxiterations):         # can't break early
+        z = z**2 + c                       # applying z → z² + c
+        diverged = numpy.absolute(z) > 2   # |z| > 2 is "divergence"
+        diverging_now = diverged & (fractal == maxiterations)
+        fractal[diverging_now] = i         # only set the new ones
+        z[diverged] = 2                    # clamp diverged at 2
+    return fractal
+
+
+fractal = run_numpy(6400, 9600)            # runs 15× faster
+\end{minted}
+\end{columns}
+\end{frame}
+
 
 \end{document}
