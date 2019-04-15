@@ -74,7 +74,7 @@
 \uncover<2->{I started by showing how for-loopy code must be fundamentally rewritten to take advantage of Numpy and why it might be worth the effort.}
 
 \vspace{0.5 cm}
-\uncover<3->{\textcolor{darkblue}{Surprise!} They were more comfortable with the \mbox{vectorized form (Numpy/Pandas)---\hspace{-0.5 cm}} for loops were {\it less familiar}.}
+\uncover<3->{\textcolor{darkblue}{Surprise!} They were {\it more comfortable} with the \mbox{vectorized form (Numpy/Pandas).\hspace{-0.5 cm}} Going the other way---from Numpy to for loops---was more of an issue.}
 \end{frame}
 
 \begin{frame}[fragile]{Knowing your audience}
@@ -142,6 +142,14 @@ This talk will be about getting \textcolor{darkblue}{event-at-a-time} in Python 
 \end{columns}
 \end{frame}
 
+%% \begin{frame}{How does it differ from\ldots}
+%% \large
+%% \vspace{0.5 cm}
+%% \begin{description}
+%% \item[] PyPy, Julia, Cling; maybe this is not the place for that.
+%% \end{description}
+%% \end{frame}
+
 \begin{frame}{I've been using Numba for more than 2 years\ldots}
 \vspace{0.5 cm}
 {\large \ldots and it always wins in my ease-of-use judgements and performance tests.}
@@ -150,12 +158,12 @@ This talk will be about getting \textcolor{darkblue}{event-at-a-time} in Python 
 \begin{tabular}{l c r c}
 {\bf Method}               & {\bf Configuration} & {\bf Speedup} & {\bf Cores} \\\hline
 Pure Python                & for-loopy           &     $1\times$ & 1 \\
-Numba                      & for-loopy           &    $50\times$ & 1 \\
-Numba-parallel             & for-loopy           &   $165\times$ & all (12) \\
+\textcolor{darkblue}{Numba}                      & \textcolor{darkblue}{for-loopy}           &    \textcolor{darkblue}{$50\times$} & \textcolor{darkblue}{1} \\
+\textcolor{darkblue}{Numba-parallel}             & \textcolor{darkblue}{for-loopy}           &   \textcolor{darkblue}{$165\times$} & \textcolor{darkblue}{all (12)} \\
 Numpy                      & columnar            &    $15\times$ & 1 \\
 CuPy                       & columnar            &    $77\times$ & GPU \\
 Dask                       & columnar            &    $26\times$ & all (12) \\
-Numba-CUDA                 & CUDA details        &   $800\times$ & GPU \\
+\textcolor{darkblue}{Numba-CUDA}                 & \textcolor{darkblue}{CUDA details}        &   \textcolor{darkblue}{$800\times$} & \textcolor{darkblue}{GPU} \\
 pybind11 {\tt -O3}         & for-loopy C++       &    $34\times$ & 1 \\
 pybind11 {\tt -ffast-math} & for-loopy C++       &    $90\times$ & 1 \\
 Cython                     & dual language       &   $3.7\times$ & 1 \\
