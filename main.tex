@@ -182,7 +182,7 @@ Cython                     & dual language       &   $3.7\times$ & 1 \\
 import numpy
 
 
-def run_python(height, width, maxiterations=20):
+def run_plain(height, width, maxiterations=20):
     y, x = numpy.ogrid[-1:0:height*1j, -1.5:0:width*1j]
     c = x + y*1j
     fractal = numpy.full(c.shape, maxiterations, dtype=numpy.int32)
@@ -196,7 +196,7 @@ def run_python(height, width, maxiterations=20):
                     break                  # we're done; go away
     return fractal
 
-fractal = run_python(6400, 9600)
+fractal = run_plain(6400, 9600)
 \end{minted}
 \end{onlyenv}
 \begin{onlyenv}<2>
@@ -218,7 +218,7 @@ def run_numba(height, width, maxiterations=20):
                     break                  # we're done; go away
     return fractal
 
-fractal = run_numba(6400, 9600)            # runs 50× faster
+fractal = run_numba(6400, 9600)            # runs 50× faster than plain
 \end{minted}
 \end{onlyenv}
 \end{columns}
@@ -246,10 +246,23 @@ def run_numpy(height, width, maxiterations=20):
     return fractal
 
 
-fractal = run_numpy(6400, 9600)            # runs 15× faster
+fractal = run_numpy(6400, 9600)            # runs 15× faster than plain
 \end{minted}
 \end{columns}
 \end{frame}
+
+\begin{frame}{Here's the catch:}
+\Large
+\vspace{0.5 cm}
+Numba can only accelerate \textcolor{darkblue}{functions} and \textcolor{darkblue}{data structures} that it recognizes (mostly numbers and arrays).
+
+\vspace{1 cm}
+\uncover<2->{They must be \textcolor{darkblue}{statically typed} (all types known before execution).}
+
+\vspace{1 cm}
+\uncover<3->{\mintinline{python}{@numba.jit(nopython=True)} only allows accelerated code; \mintinline{python}{@numba.jit()} only accelerates what it can.}
+\end{frame}
+
 
 
 \end{document}
