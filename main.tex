@@ -157,7 +157,7 @@ This talk will be about getting \textcolor{darkblue}{event-at-a-time} in Python 
 \begin{center}
 \begin{tabular}{l c r c}
 {\bf Method}               & {\bf Configuration} & {\bf Speedup} & {\bf Cores} \\\hline
-Pure Python                & for-loopy           &     $1\times$ & 1 \\
+Plain Python               & for-loopy           &     $1\times$ & 1 \\
 \textcolor{darkblue}{Numba}                      & \textcolor{darkblue}{for-loopy}           &    \textcolor{darkblue}{$50\times$} & \textcolor{darkblue}{1} \\
 \textcolor{darkblue}{Numba-parallel}             & \textcolor{darkblue}{for-loopy}           &   \textcolor{darkblue}{$165\times$} & \textcolor{darkblue}{all (12)} \\
 Numpy                      & columnar            &    $15\times$ & 1 \\
@@ -328,8 +328,8 @@ def random_particles(num_per_event, num_events):
                      awkward.JaggedArray.fromcounts(num, eta),
                          awkward.JaggedArray.fromcounts(num, phi))
 
-num_muons, pt_muons, eta_muons, phi_muons = random_particles(1.5, 100000)
-num_jets,  pt_jets,  eta_jets,  phi_jets  = random_particles(3.5, 100000)
+num_muons, pt_muons, eta_muons, phi_muons = random_particles(1.5, 1000000)
+num_jets,  pt_jets,  eta_jets,  phi_jets  = random_particles(3.5, 1000000)
 \end{minted}
 
 \vspace{0.35 cm}
@@ -338,12 +338,12 @@ num_jets,  pt_jets,  eta_jets,  phi_jets  = random_particles(3.5, 100000)
 
 \vspace{0.1 cm}
 \begin{minted}{python}
-def unzip(pairs):
-    return pairs.i0, pairs.i1
+def unzip(pairs): return pairs.i0, pairs.i1
 pt1, pt2   = unzip(pt_muons.cross(pt_jets))       # make a big array of all pairs
-eta1, eta2 = unzip(eta_muons.cross(eta_jets))
-phi1, phi2 = unzip(phi_muons.cross(phi_jets))
+eta1, eta2 = unzip(eta_muons.cross(eta_jets))     # separately for each attribute
+phi1, phi2 = unzip(phi_muons.cross(phi_jets))     # because we don't have Tables yet
 
+# compute mass for all muon-jet pairs in all events in one line
 mass = numpy.sqrt(2*pt1*pt2*(numpy.cosh(eta1 - eta2) - numpy.cos(phi1 - phi2)))
 \end{minted}
 \end{uncoverenv}
@@ -373,8 +373,8 @@ def run_plain(num_muons, pt_muons, eta_muons, phi_muons,
                 pt2  = pt_jets[i][jeti]
                 eta2 = eta_jets[i][jeti]
                 phi2 = phi_jets[i][jeti]
-                content[offsets[i + 1]] = numpy.sqrt(2*pt1*pt2*(numpy.cosh(eta1 - eta2)
-                                                     - numpy.cos(phi1 - phi2)))
+                content[offsets[i + 1]] = numpy.sqrt(
+                    2*pt1*pt2*(numpy.cosh(eta1 - eta2) - numpy.cos(phi1 - phi2)))
                 offsets[i + 1] += 1
     return awkward.JaggedArray(offsets[:-1], offsets[1:], content)
 \end{minted}
@@ -397,24 +397,29 @@ def run_numba(num_muons, pt_muons, eta_muons, phi_muons,     # can pass JaggedAr
                 pt2  = pt_jets[i][jeti]
                 eta2 = eta_jets[i][jeti]
                 phi2 = phi_jets[i][jeti]
-                content[offsets[i + 1]] = numpy.sqrt(2*pt1*pt2*(numpy.cosh(eta1 - eta2)
-                                                     - numpy.cos(phi1 - phi2)))
+                content[offsets[i + 1]] = numpy.sqrt(
+                    2*pt1*pt2*(numpy.cosh(eta1 - eta2) - numpy.cos(phi1 - phi2)))
                 offsets[i + 1] += 1
-    return awkward.JaggedArray(offsets[:-1], offsets[1:], content)
+    return awkward.JaggedArray(offsets[:-1], offsets[1:], content)          # and out!
 \end{minted}
 \end{onlyenv}
 \end{frame}
 
-\begin{frame}{}
-Python 12 seconds
-JaggedArray.cross 0.070 seconds
-Numba 0.62 seconds to compile
-      0.022 seconds to run
+\begin{frame}{What this buys us}
+\large
+\vspace{0.5 cm}
+\begin{center}
+\begin{tabular}{l l l l}
+{\bf Method} & {\bf Pro}  & {\bf Con}  & {\bf Runtime} \\\hline
+{\tt JaggedArray.cross} & concise  & inflexible & \textcolor{white}{12}1.1\textcolor{white}{2} seconds \\
+Plain Python loop       & explicit & verbose    & 120\textcolor{white}{.62} seconds \\
+Numba-compiled          & explicit & verbose    & \textcolor{white}{12}0.62 seconds (to compile) \\
+                        &          &            & \textcolor{white}{12}0.22 seconds (to run)
+\end{tabular}
+\end{center}
 
-Python 120 seconds (2 minutes)
-JaggedArray.cross 1.1 seconds
-Numba 0.62 seconds to compile
-      0.22 seconds to run
+\vspace{0.25 cm}
+Apart from a factor of 5 between {\tt\normalsize JaggedArray.cross} and Numba-compiled (which may leap-frog as implementations improve), we can now write arbitrary for-loop algorithms on {\tt\normalsize JaggedArray} without an enormous cost.
 \end{frame}
 
 
