@@ -57,8 +57,8 @@
 % START START START START START START START START START START START START START
 
 \begin{frame}{Knowing your audience}
-\vspace{1 cm}
-{\large I presented a ``Accelerating Python'' tutorial to non-particle physics scientists:}
+\vspace{0.5 cm}
+{\large I presented an ``Accelerating Python'' tutorial to non-particle physics scientists:}
 
 \small
 \begin{itemize}\setlength{\itemsep}{-0.1 cm}
@@ -75,6 +75,50 @@
 
 \vspace{0.5 cm}
 \uncover<3->{\textcolor{darkblue}{Surprise!} They were more comfortable with the \mbox{vectorized form (Numpy/Pandas)---\hspace{-0.5 cm}} for loops were {\it less familiar}.}
+\end{frame}
+
+\begin{frame}[fragile]{Knowing your audience}
+\large
+\vspace{0.5 cm}
+Regardless of which side of the divide you start from, \textcolor{darkblue}{event-at-a-time} and \textcolor{darkblue}{operation-at-a-time} approaches are rather different and have different advantages.
+
+\vspace{0.25 cm}
+\begin{columns}[t]
+\column{0.47\linewidth}
+\textcolor{darkblue}{\underline{event-at-a-time}}
+
+{\small
+\begin{minted}[stripnl=false]{python}
+for event in everything:
+    a = step1(event)
+    b = step2(a)
+    write_one(b)
+\end{minted}
+}
+
+\begin{itemize}
+\item<2-> Good for debugging: insert breakpoints, watch variables to understand a single event.
+\item<3-> Detail can obscure big picture.
+\end{itemize}
+
+\column{0.46\linewidth}
+\textcolor{darkblue}{\underline{operation-at-a-time}}
+
+{\small
+\begin{minted}[stripnl=false]{python}
+a = step1(everything)
+b = step2(a)
+write_all(b)
+
+\end{minted}
+}
+
+\begin{itemize}
+\item<4-> Composition of functions can read like natural language.
+\item<5-> Indexes can be hard to align: ``error driven development!''
+\end{itemize}
+
+\end{columns}
 \end{frame}
 
 \end{document}
