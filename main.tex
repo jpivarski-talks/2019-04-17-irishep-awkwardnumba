@@ -313,6 +313,104 @@ so that they can be used in Numba functions written by users.
 \uncover<3->{\textcolor{darkorange}{\bf To use:} \vspace{0.5\baselineskip}\\ \large \mbox{\hspace{1.5 cm}\mintinline{bash}{pip install awkward-numba}} or \\ \mbox{\hspace{1.5 cm}\mintinline{bash}{conda install -c conda-forge awkward-numba}} \vspace{0.5\baselineskip}\\ and then \mintinline{python}{import awkward.numba} in Python.}
 \end{frame}
 
+\begin{frame}[fragile]{Physics-motivated example: pairs of muons and jets}
+\vspace{0.15 cm}
+\scriptsize
+\begin{minted}{python}
+import numpy, numba, awkward, awkward.numba
+
+def random_particles(num_per_event, num_events):
+    num = numpy.random.poisson(num_per_event, num_events)
+    pt  = numpy.random.exponential(10, num.sum())
+    eta = numpy.random.normal(0, 1, num.sum())
+    phi = numpy.random.uniform(-numpy.pi, numpy.pi, num.sum())
+    return (num, awkward.JaggedArray.fromcounts(num, pt),
+                     awkward.JaggedArray.fromcounts(num, eta),
+                         awkward.JaggedArray.fromcounts(num, phi))
+
+num_muons, pt_muons, eta_muons, phi_muons = random_particles(1.5, 100000)
+num_jets,  pt_jets,  eta_jets,  phi_jets  = random_particles(3.5, 100000)
+\end{minted}
+
+\vspace{0.35 cm}
+\begin{uncoverenv}<2->
+{\normalsize Each of these is a jagged array of particle attributes. Mass of all muon-jet pairs is}
+
+\vspace{0.1 cm}
+\begin{minted}{python}
+def unzip(pairs):
+    return pairs.i0, pairs.i1
+pt1, pt2   = unzip(pt_muons.cross(pt_jets))       # make a big array of all pairs
+eta1, eta2 = unzip(eta_muons.cross(eta_jets))
+phi1, phi2 = unzip(phi_muons.cross(phi_jets))
+
+mass = numpy.sqrt(2*pt1*pt2*(numpy.cosh(eta1 - eta2) - numpy.cos(phi1 - phi2)))
+\end{minted}
+\end{uncoverenv}
+\end{frame}
+
+\begin{frame}[fragile]{Physics-motivated example: pairs of muons and jets}
+\vspace{0.25 cm}
+
+{For-loopy code to do the same thing (i.e.\ a conventional analysis):}
+
+\scriptsize
+\begin{onlyenv}<1>
+\begin{minted}[stripnl=false]{python}
+
+def run_plain(num_muons, pt_muons, eta_muons, phi_muons,
+              num_jets,  pt_jets,  eta_jets,  phi_jets):
+    offsets = numpy.empty(len(num_muons) + 1, numpy.int64)
+    content = numpy.empty((num_muons * num_jets).sum())
+    offsets[0] = 0
+    for i in range(len(num_muons)):
+        offsets[i + 1] = offsets[i]
+        for muoni in range(num_muons[i]):
+            pt1  = pt_muons[i][muoni]
+            eta1 = eta_muons[i][muoni]
+            phi1 = phi_muons[i][muoni]
+            for jeti in range(num_jets[i]):
+                pt2  = pt_jets[i][jeti]
+                eta2 = eta_jets[i][jeti]
+                phi2 = phi_jets[i][jeti]
+                content[offsets[i + 1]] = numpy.sqrt(2*pt1*pt2*(numpy.cosh(eta1 - eta2)
+                                                     - numpy.cos(phi1 - phi2)))
+                offsets[i + 1] += 1
+    return awkward.JaggedArray(offsets[:-1], offsets[1:], content)
+\end{minted}
+\end{onlyenv}
+\begin{onlyenv}<2>
+\begin{minted}[stripnl=false]{python}
+@numba.jit(nopython=True)
+def run_numba(num_muons, pt_muons, eta_muons, phi_muons,     # can pass JaggedArrays
+              num_jets,  pt_jets,  eta_jets,  phi_jets):     # into Numba-JIT function
+    offsets = numpy.empty(len(num_muons) + 1, numpy.int64)
+    content = numpy.empty((num_muons * num_jets).sum())
+    offsets[0] = 0
+    for i in range(len(num_muons)):
+        offsets[i + 1] = offsets[i]
+        for muoni in range(num_muons[i]):
+            pt1  = pt_muons[i][muoni]
+            eta1 = eta_muons[i][muoni]
+            phi1 = phi_muons[i][muoni]
+            for jeti in range(num_jets[i]):
+                pt2  = pt_jets[i][jeti]
+                eta2 = eta_jets[i][jeti]
+                phi2 = phi_jets[i][jeti]
+                content[offsets[i + 1]] = numpy.sqrt(2*pt1*pt2*(numpy.cosh(eta1 - eta2)
+                                                     - numpy.cos(phi1 - phi2)))
+                offsets[i + 1] += 1
+    return awkward.JaggedArray(offsets[:-1], offsets[1:], content)
+\end{minted}
+\end{onlyenv}
+\end{frame}
+
+\begin{frame}{}
+Python 12 seconds
+JaggedArray.cross 0.070 seconds
+Numba 0.62 seconds to compile
+      0.022 seconds to run
+\end{frame}
 
 
 \end{document}
