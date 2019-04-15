@@ -142,4 +142,31 @@ This talk will be about getting \textcolor{darkblue}{event-at-a-time} in Python 
 \end{columns}
 \end{frame}
 
+\begin{frame}{I've been using Numba for more than 2 years\ldots}
+\vspace{0.5 cm}
+{\large \ldots and it always wins in my ease-of-use judgements and performance tests.}
+
+\begin{center}
+\begin{tabular}{l c r c}
+{\bf Method}               & {\bf Configuration} & {\bf Speedup} & {\bf Cores} \\\hline
+Pure Python                & for-loopy           &     $1\times$ & 1 \\
+Numba                      & for-loopy           &    $50\times$ & 1 \\
+Numba-parallel             & for-loopy           &   $165\times$ & all (12) \\
+Numpy                      & columnar            &    $15\times$ & 1 \\
+CuPy                       & columnar            &    $77\times$ & GPU \\
+Dask                       & columnar            &    $26\times$ & all (12) \\
+Numba-CUDA                 & CUDA details        &   $800\times$ & GPU \\
+pybind11                   & for-loopy C++       &    $34\times$ & 1 \\
+pybind11 {\tt -ffast-math} & for-loopy C++       &    $90\times$ & 1 \\
+Cython                     & dual language       &   $3.7\times$ & 1 \\
+\end{tabular}
+\end{center}
+
+\textcolor{gray}{(Sorted by my ease-of-use judgement.)}
+\end{frame}
+
+\begin{frame}{}
+
+\end{frame}
+
 \end{document}
